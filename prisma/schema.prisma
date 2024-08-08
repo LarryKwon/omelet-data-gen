@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model juso {
+  id                                                                              String             @id(map: "juso_pk") @db.VarChar(25)
+  road_address_code                                                               String?            @db.VarChar(12)
+  eupmyeondong_serial                                                             String?            @db.VarChar(2)
+  is_under                                                                        String?            @db.VarChar(1)
+  buildingmainnum                                                                 String?            @db.VarChar(5)
+  buildingextranum                                                                String?            @db.VarChar(5)
+  statedirectnum                                                                  String?            @db.VarChar(5)
+  modification_reason                                                             String?            @db.VarChar(2)
+  registerdate                                                                    String?            @db.VarChar(8)
+  prev_address_name                                                               String?            @db.VarChar(25)
+  detail_address                                                                  String?            @db.VarChar(1)
+  road_address_code_juso_road_address_code_eupmyeondong_serialToroad_address_code road_address_code? @relation("juso_road_address_code_eupmyeondong_serialToroad_address_code", fields: [road_address_code, eupmyeondong_serial], references: [address_code, eupmyeondong_serial], onDelete: NoAction, onUpdate: NoAction, map: "juso_road_address_code_null_null_fk")
+}
+
+model road_address_code {
+  address_code                                                       String  @db.VarChar(12)
+  address_name                                                       String? @db.VarChar(80)
+  address_name_en                                                    String? @db.VarChar(80)
+  eupmyeondong_serial                                                String  @db.VarChar(2)
+  sido_name                                                          String? @db.VarChar(20)
+  sido_name_en                                                       String? @db.VarChar(40)
+  sigungu_name                                                       String? @db.VarChar(20)
+  sigungu_name_en                                                    String? @db.VarChar(40)
+  eupmyeondong_name                                                  String? @db.VarChar(20)
+  eupmyeondong_name_en                                               String? @db.VarChar(40)
+  is_eupmyeondong                                                    String? @db.VarChar(1)
+  eupmyeondong_code                                                  String? @db.VarChar(3)
+  is_used                                                            String? @db.VarChar(1)
+  modification_reason                                                String? @db.VarChar(1)
+  modification_history                                               String? @db.VarChar(14)
+  registerdate                                                       String? @db.VarChar(8)
+  expireddate                                                        String? @db.VarChar(8)
+  juso_juso_road_address_code_eupmyeondong_serialToroad_address_code juso[]  @relation("juso_road_address_code_eupmyeondong_serialToroad_address_code")
+
+  @@id([address_code, eupmyeondong_serial], map: "road_address_code_pk")
+}
+
+model tb_address {
+  address            String               @unique(map: "tb_address_address_uk") @db.VarChar(200)
+  latitude           String               @db.VarChar(200)
+  longitude          String               @db.VarChar(200)
+  full_address       String?              @db.VarChar(1024)
+  id                 Int                  @id(map: "tb_address_id_pk") @default(autoincrement())
+  tb_address_synonym tb_address_synonym[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_address_synonym {
+  address_alias String?     @unique(map: "tb_address_synonym_pk") @db.VarChar(1024)
+  address_id    Int?
+  tb_address    tb_address? @relation(fields: [address_id], references: [id], map: "foreign_key_name")
+
+  @@ignore
+}
